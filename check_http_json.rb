@@ -164,6 +164,16 @@ def nutty_parse(thresh, want, got, v, element)
         end
     end
 
+    # if there is a floating point threshold
+    # got > want
+    if want =~ /^(\d+\.\d+)$/ then
+        if got.to_f > $1.to_f then
+            retval = '%s is above threshold value %s (%s)' % [element, $1, got]
+        else
+            retval = 'OK'
+        end
+    end
+
     if retval == 'OK' then
         say(v, '%s threshold not exceeded.' % [thresh])
     elsif retval == 'KO' then
@@ -327,12 +337,12 @@ def parse_args(options)
         end
 
         options[:warn] = nil
-        opts.on('-w', '--warn VALUE', 'Warning threshold (integer).') do |x|
+        opts.on('-w', '--warn VALUE', 'Warning threshold (number).') do |x|
             options[:warn] = x.to_s
         end
 
         options[:crit] = nil
-        opts.on('-c', '--crit VALUE', 'Critical threshold (integer).') do |x|
+        opts.on('-c', '--crit VALUE', 'Critical threshold (number).') do |x|
             options[:crit] = x.to_s
         end
 
@@ -389,6 +399,11 @@ def parse_args(options)
         options[:timeout] = 5
         opts.on('-t', '--timeout SECONDS', 'Wait before HTTP timeout.') do |x|
             options[:timeout] = x.to_i
+        end
+
+        options[:device_name] = nil
+        opts.on('--device_name NAME', '(Kubernetes) Device name to select.') do |x|
+            options[:device_name] = x
         end
     end
 
@@ -467,6 +482,12 @@ if options[:file] then
     json = file_target(options)
 end
 
+if options[:device_name] then
+    json = json.select do |obj|
+        obj['device_name'] == options[:device_name]
+    end
+end
+
 # Flatten that bad boy.
 json_flat = hash_flatten(json, options[:delimiter])
 
@@ -533,7 +554,7 @@ elsif options[:result_regex_warn] && options[:result_regex_crit]
 end
 
 if options[:crit]
-    Nagios.ok = '%s within treshold W:%s C:%s' % [element_message_name, options[:warn], options[:crit]]
+    Nagios.ok = '%s within threshold W:%s C:%s' % [element_message_name, options[:warn], options[:crit]]
 end
 
 # Check all elements
