@@ -18,8 +18,8 @@ Usage: ./check_http_json.rb -u <URI> -e <element> -w <warn> -c <crit>
     -E, --element_regex REGEX        Desired element expressed as regular expression.
         --element_regex_global       Check all occurring matches. -E is required.
     -d, --delimiter CHARACTER        Element delimiter (default is period).
-    -w, --warn VALUE                 Warning threshold (integer).
-    -c, --crit VALUE                 Critical threshold (integer).
+    -w, --warn VALUE                 Warning threshold (number).
+    -c, --crit VALUE                 Critical threshold (number).
     -r, --result STRING              Expected string result. No need for -w or -c.
     -R, --result_regex REGEX         Expected string result expressed as regular expression. No need for -w or -c.
     -W, --result_warn STRING         Warning if element is [string]. -C is required.
@@ -28,12 +28,13 @@ Usage: ./check_http_json.rb -u <URI> -e <element> -w <warn> -c <crit>
         --result_warn_regex REGEX    Warning if element matches REGEX. --result_crit_regex is required.
         --result_unknown_regex REGEX Unknown if element matches REGEX. --result_crit_regex is required.
         --result_crit_regex REGEX    Critical if element matches REGEX. --result_warn_regex is required.
-    -p, --perf ELEMENT               Output additional fields (performance metrics).
-        --perf_splitter CHARACTER    Additional fields delimiter (default is comma).
+    -p, --perf ELEMENT               Output additional fields (performance metrics); comma-separated.
+        --perf_splitter CHARACTER    Specify an alternative character to split performance keys.
     -t, --timeout SECONDS            Wait before HTTP timeout.
+        --device_name NAME           (Kubernetes) Device name to select.
 ```
 
-The `--warn` and `--crit` arguments conform to the Nagios [threshold format guidelines].
+The `--warn` and `--crit` arguments conform to the Nagios [threshold format guidelines], plus support for floating point thresholds.
 
 If a simple result of either string or regular expression (`-r` or `-R`) is specified:
 
